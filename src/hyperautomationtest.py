@@ -73,9 +73,9 @@ def main():
         ExtractAPI.initialize()
         
         # variables for GeoJson
-        police_polygons = grabGeoData("Police_polygonsformatted.json")
-        cc_polygons = grabGeoData("CC_polygonsformatted.json")
-        sna_polygons = grabGeoData("SNA_polygonsformatted.json")
+        police_polygons = grabGeoData("Police_polygonsformattedFINAL.json")
+        cc_polygons = grabGeoData("CC_polygonsformattedFINAL.json")
+        sna_polygons = grabGeoData("SNA_polygonsformattedFINAL.json")
         allGeo = {"CPD_NEIGHBORHOOD": police_polygons,"COMMUNITY_COUNCIL_NEIGHBORHOOD": cc_polygons,"SNA_NEIGHBORHOOD": sna_polygons}
         
         # grab the shp file columns 

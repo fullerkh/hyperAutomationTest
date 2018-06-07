@@ -9,6 +9,7 @@
 #    properties and geo. 
 
 import json
+from geomet import wkt
 
 #-----------------------------------------------------------------------------
 #   Neighborhood Class
@@ -59,17 +60,19 @@ def grabGeoData(jsonF):
         with open(jsonF) as json_data:
             data = json.load(json_data)
         switcher = {
-            "Police_polygonsformatted.json" : "NHOOD",
-            "CC_polygonsformatted.json" : "NEIGH",
-            "SNA_polygonsformatted.json": "SNA_NAME"
+            "Police_polygonsformattedFINAL.json" : "NHOOD",
+            "CC_polygonsformattedFINAL.json" : "NEIGH",
+            "SNA_polygonsformattedFINAL.json": "SNA_NAME"
         }
         fieldName = switcher[jsonF]
         count = 0
         for feature in data['features']:            
             name = feature['properties'][fieldName].upper()
             properties = feature['properties']
-            properties.update({"GEOMETRY" : [feature['geometry']['type'], feature['geometry']['coordinates']]})
+            properties.update({"GEOMETRY" : feature['geometry']})
             entry = Neighborhood(name, properties)
+            for key, value in properties.iteritems():
+                print str(key) + " " + str(value)
             count +=1
             map.update({name : entry})
             #print name
@@ -79,6 +82,14 @@ def grabGeoData(jsonF):
         print "A fatal error occurred while grabbing the Geographic data in " + jsonF + ":\n", e, "\nExiting now."
         exit(-1)
       
+#------------------------------------------------------------------------------
+#   geojson2wkt
+#------------------------------------------------------------------------------
+
+def geojson2wkt(geojson):
+    print geojson
+    coordinates = wkt.dumps(geojson, 0)
+    return coordinates
 #------------------------------------------------------------------------------
 #   geoColumnNames
 #------------------------------------------------------------------------------
