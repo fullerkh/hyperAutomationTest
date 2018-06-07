@@ -43,8 +43,6 @@ def populateExtract(extract, oracleTable, allGeo, geoColumns):
         for record in oracleTable:
             row = Row(schema)
             for key,value in record.getData():
-                if key == "CITYSTATEZIP":
-                    print str(value)
                 setData(getColumns[key], value ,row, schema)
                 if key in geoColumns: # if the column name is CPD_NEIGHBORHOOD, SNA_NEIGHBORHOD, or COMMUNITY_COUNCIL_NEIGHBORHOOD
                     for column in geoColumns[key]: # for the column names in geoColumns( whichever key it hit)
@@ -52,7 +50,7 @@ def populateExtract(extract, oracleTable, allGeo, geoColumns):
                         if value != None and value != 'N/A':
                             cellValue = allGeo[key][value].getProperty(column) 
                         else: 
-                            #print "allGeo[" + str(key) + "][" + str(value) + "].getProperty(" + str(column) + ")"
+                            print "allGeo[" + str(key) + "][" + str(value) + "].getProperty(" + str(column) + ")"
                             cellValue = None
                             
                         setData(getColumns[column], cellValue ,row, schema) # find the column position in the hyper schema and set the the value. # have to find out how to get the proper value. 
@@ -115,7 +113,7 @@ def setStr(row, index, value):
     return row
 
 def setSpace(row, index, value):
-    print value 
+    #print value 
     #take geojson coordinates and turn them ino wkt --- the way that's compatible with the extract api 
     coordinates = geojson2wkt(value)
     row.setSpatial(index, coordinates) # coordinates will be where the fake data is. 

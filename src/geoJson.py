@@ -71,8 +71,8 @@ def grabGeoData(jsonF):
             properties = feature['properties']
             properties.update({"GEOMETRY" : feature['geometry']})
             entry = Neighborhood(name, properties)
-            for key, value in properties.iteritems():
-                print str(key) + " " + str(value)
+            #for key, value in properties.iteritems():
+                #print str(key) + " " + str(value)
             count +=1
             map.update({name : entry})
             #print name

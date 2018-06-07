@@ -8,8 +8,8 @@
 #   By: Kyle Fuller
 
 # ex: py -2.7 hyperautomationtest.py -b -j SHOOTINGS_TEST_FOR_KYLE.JSON -e SHOOTINGS_TEST_FOR_KYLE.hyper # will no longer work as the script requires fields based off of the input geo 
-# v0.20 ex:  py -2.7 hyperautomationtest.py -b -j SHOOTINGS_TEST_FOR_KYLE.JSON -e Shootings_Test.hyper
-# v0.25 ex:  py -2.7 hyperautomationtest.py -b -d OPEN_DATA_CPD_SHOOTINGS_X -e Shootings_Test.hyper
+# v0.20 ex:  py -2.7 hyperautomationtest.py -b -j SHOOTINGS_TEST_FOR_KYLE.JSON -e Shootings_Test.hyper # now uses oracle db
+# v0.25 ex:  py -2.7 hyperautomationtest.py -b -d OPEN_DATA_CPD_SHOOTINGS_X -e Shootings_Test.hyper 
 
 # import statments 
 import argparse
