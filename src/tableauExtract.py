@@ -34,29 +34,37 @@ def openExtract(
 def populateExtract(extract, oracleTable, allGeo, geoColumns):
     
     try:
+        errorColumn = ""
+        count = 0
+        
         # Get Schema
         table = extract.openTable( 'Extract' )
         schema = table.getTableDefinition()
         getColumns = allColumns(schema)
-        # Insert Data
         
+        # Insert Data
         for record in oracleTable:
+            count +=1
             row = Row(schema)
             for key,value in record.getData():
+                #print "setData(" + str(key) + "," + str(value) + ", row, schema)"
+                errorColumn = " at " + key + " in the oracle table"
                 setData(getColumns[key], value ,row, schema)
                 if key in geoColumns: # if the column name is CPD_NEIGHBORHOOD, SNA_NEIGHBORHOD, or COMMUNITY_COUNCIL_NEIGHBORHOOD
                     for column in geoColumns[key]: # for the column names in geoColumns( whichever key it hit)
-                        #print "allGeo[" + str(key) + "][" + str(value) + "].getProperty(" + str(column) + ")"
+#                        print "allGeo[" + str(key) + "][" + str(value) + "].getProperty(" + str(column) + ")"
+#                        if str(key) == "COMMUNITY_COUNCIL_NEIGHBORHOOD" and str(value) == "CUF" and str(column) == "GEOMETRY":
+#                            print allGeo[key][value].getProperty(column)
                         if value != None and value != 'N/A':
                             cellValue = allGeo[key][value].getProperty(column) 
                         else: 
-                            print "allGeo[" + str(key) + "][" + str(value) + "].getProperty(" + str(column) + ")"
                             cellValue = None
-                            
+                        errorColumn = " at " + column + " in the geometry columns of " + key
                         setData(getColumns[column], cellValue ,row, schema) # find the column position in the hyper schema and set the the value. # have to find out how to get the proper value. 
+            print count
             table.insert(row)
     except TableauException, e:
-        print 'A fatal error occurred while populating the extract:\n', e, '\nExiting now.'
+        print 'A fatal error occurred while populating the extract'+ errorColumn +' the record count was = '+ count +':\n', e, '\nExiting now.'
         exit( -1 )
 
 #------------------------------------------------------------------------------
@@ -69,7 +77,7 @@ def allColumns(schema):
     position = 0
     while position < schema.getColumnCount():
         columnName = schema.getColumnName(position).upper()
-        print columnName
+        #print columnName
         columnPositions.update({columnName : position})
         position+=1
 # Columns = allColumns(schema) # will use values to search for keys 
@@ -109,14 +117,14 @@ def setCharStr(row, index, value):
     return row
 
 def setStr(row, index, value):
-    row.setString(index, value) # add + "  TEST" to ensure that new rows are ebeing added. 
+    row.setString(index, value + " test1") # add + "  TEST" to ensure that new rows are ebeing added. 
     return row
 
 def setSpace(row, index, value):
     #print value 
     #take geojson coordinates and turn them ino wkt --- the way that's compatible with the extract api 
     coordinates = geojson2wkt(value)
-    row.setSpatial(index, coordinates) # coordinates will be where the fake data is. 
+    row.setSpatial(index, coordinates)
     return row    
 
 #------------------------------------------------------------------------------

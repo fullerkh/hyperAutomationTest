@@ -10,6 +10,7 @@
 
 import json
 from geomet import wkt
+import re
 
 #-----------------------------------------------------------------------------
 #   Neighborhood Class
@@ -20,24 +21,23 @@ class Neighborhood:
 # each instance of the Record class is a JSON Dictionary containing both field name and field value
     # constructor----------------------------
     def __init__(self, name="", properties={}):     
-#        self.geometry = geometry
         self.properties = properties
         self.name = name
     # methods--------------------------------
     # Getters and Setter------------------
-#    def getGeo(self):
-#        return str(self.geometry)
-#    def setGeo(self, geometry):
-#        if type(geometry) != dict:
-#            raise ValueError() 
-#        self.geometry = geometry
     def getProperties(self):
         return str(self.properties)
     def getProperty(self, name):
-        for title in self.properties.keys():
-            if title.upper().startswith(name[:-2].upper()):
-                return self.properties[title]
-        return "no property with the name: " + name
+        property = "no property with the name: " + name
+        if hasNumbers(name):
+            for title in self.properties.keys():
+                if title.upper().startswith(name[:-2].upper()):
+                    property = self.properties[title]
+        else:
+            for title in self.properties.keys():
+                if title.upper() == name:
+                    property = self.properties[title]
+        return property
     def setProperties(self, properties):
         if type(properties) != dict:
             raise ValueError() 
@@ -60,7 +60,7 @@ def grabGeoData(jsonF):
         with open(jsonF) as json_data:
             data = json.load(json_data)
         switcher = {
-            "Police_polygonsformattedFINAL.json" : "NHOOD",
+            "CINC_POLICE_NEIGHBORHOODSformattedFINAL.json" : "NHOOD",
             "CC_polygonsformattedFINAL.json" : "NEIGH",
             "SNA_polygonsformattedFINAL.json": "SNA_NAME"
         }
@@ -87,9 +87,18 @@ def grabGeoData(jsonF):
 #------------------------------------------------------------------------------
 
 def geojson2wkt(geojson):
-    print geojson
-    coordinates = wkt.dumps(geojson, 0)
+    #print geojson
+    coordinates = wkt.dumps(geojson, 6)
+    # print what kind of geometry we are dealing with
+    #print coordinates[0:coordinates.find(" ")]
     return coordinates
+
+#------------------------------------------------------------------------------
+#   hasNumbers
+#------------------------------------------------------------------------------
+
+def hasNumbers(inputString):
+    return bool(re.search(r'\d', inputString))
 #------------------------------------------------------------------------------
 #   geoColumnNames
 #------------------------------------------------------------------------------

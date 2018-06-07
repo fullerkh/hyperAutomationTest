@@ -1,15 +1,60 @@
-# Extract Automation
-# Python v 2.7.10
-#   v0.0: 05/25/2018 --- Start date
-#   v0.1: 05/30/2018 first success with tabular data
-#   v0.15: 05/31/2018 splitting hyperautmationtest.py into 4 separate py 
-#   v0.20: 06/04/2018 updated populate data (easier). assumes geoData present -- TOP PRIPORITY setSpatial not working. cx_Oracle not imported
-#   v0.25: 06/05/2018 substitute cx_Oracle for json files. runs the shootings hyper perfectly with fake geo data. -- TOP PRIORITY setSpatial not working. need to be able to delete files. 
-#   By: Kyle Fuller
+"""
+ Extract Automation
+ Python v 2.7.10
+   v0.0: 05/25/2018 --- Start date
+   v0.1: 05/30/2018 first success with tabular data
+   v0.15: 05/31/2018 splitting hyperautmationtest.py into 4 separate py 
+   v0.20: 06/04/2018 updated populate data (easier). assumes geoData present -- TOP PRIPORITY setSpatial not working. cx_Oracle not imported
+   v0.25: 06/05/2018 substitute cx_Oracle for json files. runs the shootings hyper perfectly with fake geo data. -- TOP PRIORITY setSpatial not working. need to be able to delete files. 
+   v0.30: 06/07/2018 runs the shootings hyper with real geo data. -- TOP PRIORITY need to be able to delete files. -- Other problems -- seems like the geojson files might be missing whole neighborhoods.
+   By: Kyle Fuller
 
-# ex: py -2.7 hyperautomationtest.py -b -j SHOOTINGS_TEST_FOR_KYLE.JSON -e SHOOTINGS_TEST_FOR_KYLE.hyper # will no longer work as the script requires fields based off of the input geo 
-# v0.20 ex:  py -2.7 hyperautomationtest.py -b -j SHOOTINGS_TEST_FOR_KYLE.JSON -e Shootings_Test.hyper # now uses oracle db
-# v0.25 ex:  py -2.7 hyperautomationtest.py -b -d OPEN_DATA_CPD_SHOOTINGS_X -e Shootings_Test.hyper 
+
+OTHER NOTES: 
+    The geometry files are very particular. DO NOT MESS WITH THE ORIGINALS. MAKE COPIES!!!
+
+    
+GEOJSON DATA STRUCTURE: 
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -84.53282040717355,
+              39.12293490713295
+            ],
+            [
+              -84.53245967886248,
+              39.12416854746014
+            ],
+            [
+              -84.53237811881824,
+              39.12412515122782
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "Shape_Leng": 5398.147164, 
+        "NEIGH_BOUN": "Overlap Area", 
+        "Shape_Area": 0, 
+        "NEIGH": "Columbia Tusculum - Mt Lookout", 
+        "FID": 0
+      }
+    }
+  ]
+}
+    
+
+ex: py -2.7 hyperautomationtest.py -b -j SHOOTINGS_TEST_FOR_KYLE.JSON -e SHOOTINGS_TEST_FOR_KYLE.hyper # will no longer work as the script requires fields based off of the input geo 
+v0.20 ex:  py -2.7 hyperautomationtest.py -b -j SHOOTINGS_TEST_FOR_KYLE.JSON -e Shootings_Test.hyper # now uses oracle db
+v0.25 ex:  py -2.7 hyperautomationtest.py -b -d OPEN_DATA_CPD_SHOOTINGS_X -e Shootings_Test.hyper 
+"""
 
 # import statments 
 import argparse
@@ -65,7 +110,7 @@ def main():
     # Parse Arguments
     options = parseArguments()
     
-    print "you have chosen to use a json file named " + str(options[ 'Database' ]) + " to extended the hyper named "+ str(options[ 'EndHyper' ]) +"\nhave you chosen to build it?: " + str(options[ 'build' ])
+    print "you have chosen to use an oracle table named " + str(options[ 'Database' ]) + " to extended the hyper named "+ str(options[ 'EndHyper' ]) +"\nhave you chosen to build it?: " + str(options[ 'build' ])
 
     # Extract API Demo
     if ( options[ 'build' ] ):
@@ -73,7 +118,7 @@ def main():
         ExtractAPI.initialize()
         
         # variables for GeoJson
-        police_polygons = grabGeoData("Police_polygonsformattedFINAL.json")
+        police_polygons = grabGeoData("CINC_POLICE_NEIGHBORHOODSformattedFINAL.json")
         cc_polygons = grabGeoData("CC_polygonsformattedFINAL.json")
         sna_polygons = grabGeoData("SNA_polygonsformattedFINAL.json")
         allGeo = {"CPD_NEIGHBORHOOD": police_polygons,"COMMUNITY_COUNCIL_NEIGHBORHOOD": cc_polygons,"SNA_NEIGHBORHOOD": sna_polygons}
@@ -106,7 +151,7 @@ def main():
     return 0
 
 if __name__ == "__main__":
-    print"Welcome to hyperAutomation.py v0.1 \n We hope you enjoy your stay"
+    print"Welcome to hyperAutomation.py v0.25 \n We hope you enjoy your stay"
     retval = main()
     print"the real work begins here"
     sys.exit( retval )																					
