@@ -12,7 +12,9 @@
 
 OTHER NOTES: 
     The geometry files are very particular. DO NOT MESS WITH THE ORIGINALS. MAKE COPIES!!!
-
+    The geometry file were created by converting shp files into kml files and then converting those files to geojson using http://geojson.io. 
+    The next improvement may be trying to use Arcpy to either get rid of geojson files or some other data structure. (perhaps kml) 
+    setSpatial in the tableau extract API is very picky about its input. It must be formatted as wkt (wellKnownText)
     
 GEOJSON DATA STRUCTURE: 
 {
