@@ -1,7 +1,7 @@
 import json
 
-jsons = ["SNA_polygons", "CINC_POLICE_NEIGHBORHOODS", "CC_polygons"]
-
+#jsons = ["SNA_polygons", "CINC_POLICE_NEIGHBORHOODS", "CC_polygons"]
+jsons = ["convert"]
 for doc in jsons:
 	with open(doc +'.json') as json_data:
 		data = json.load(json_data)

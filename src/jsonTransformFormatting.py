@@ -5,7 +5,7 @@ jsonsGeo = ["CINC_POLICE_NEIGHBORHOODSformatted", "CC_polygonsformatted", "SNA_p
 jsonsProperties = ["CINC_POLICE_NEIGHBORHOODSformattedOriginal", "CC_polygonsformattedOriginal", "SNA_polygonsformattedOriginal"]
 
 jsonsGeoFINAL = ["CINC_POLICE_NEIGHBORHOODSformattedFINAL", "CC_polygonsformattedFINAL", "SNA_polygonsformattedFINAL"] 
-
+jsonsGeoFINAL = ["convertformatted"]
 
 def grabGeoData(jsonF):
     try:

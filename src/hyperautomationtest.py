@@ -61,6 +61,7 @@ v0.25 ex:  py -2.7 hyperautomationtest.py -b -d OPEN_DATA_CPD_SHOOTINGS_X -e Sho
 # import statments 
 import argparse
 import textwrap
+import cProfile
 
 # import of other python files. contain most of the methods and classes. 
 # these files also contain the other relevant import statements like 
