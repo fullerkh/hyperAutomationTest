@@ -26,6 +26,16 @@ def openExtract(
         exit( -1 )
 
     return extract
+#------------------------------------------------------------------------------
+#   GrabSchema 
+#------------------------------------------------------------------------------
+#   (NOTE: This function assumes that the Tableau SDK Extract API is initialized)
+
+def grabSchema(extract):
+    table = extract.openTable( 'Extract' )
+    schema = table.getTableDefinition()
+    getColumns = allColumns(schema)
+    return getColumns
 
 #------------------------------------------------------------------------------
 #   Populate Extract
@@ -52,9 +62,6 @@ def populateExtract(extract, oracleTable, allGeo, geoColumns):
                 setData(getColumns[key], value ,row, schema)
                 if key in geoColumns: # if the column name is CPD_NEIGHBORHOOD, SNA_NEIGHBORHOD, or COMMUNITY_COUNCIL_NEIGHBORHOOD
                     for column in geoColumns[key]: # for the column names in geoColumns( whichever key it hit)
-#                        print "allGeo[" + str(key) + "][" + str(value) + "].getProperty(" + str(column) + ")"
-#                        if str(key) == "COMMUNITY_COUNCIL_NEIGHBORHOOD" and str(value) == "CUF" and str(column) == "GEOMETRY":
-#                            print allGeo[key][value].getProperty(column)
                         if value != None and value != 'N/A':
                             cellValue = allGeo[key][value].getProperty(column) 
                         else: 
@@ -124,8 +131,7 @@ def setStr(row, index, value):
 def setSpace(row, index, value):
     #print value 
     #take geojson coordinates and turn them ino wkt --- the way that's compatible with the extract api 
-    coordinates = geojson2wkt(value)
-    row.setSpatial(index, coordinates)
+    row.setSpatial(index, value)
     return row    
 
 #------------------------------------------------------------------------------
