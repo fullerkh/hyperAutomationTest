@@ -28,7 +28,6 @@ import textwrap
     # import json 
     # from tableausdk import *
     # from tableausdk.HyperExtract import *
-from geoJson import *
 from oracleHandling import *
 from tableauExtract import * 
 
@@ -80,7 +79,12 @@ def main():
         # Initialize the Tableau Extract API
         ExtractAPI.initialize()
         
-        geodata = ["KYLE_COMMUNITY_COUNCIL", "KYLE_CPD_NEIGHBORHOOD", "KYLE_SNA_NEIGHBORHOOD"]
+        # grab schema
+        schema = grabSchema(options[ 'EndHyper' ])
+        # delete current hyper 
+        deleteHyper(options[ 'EndHyper' ])
+        # create new hyper 
+        createHyper(options[ 'EndHyper' ], schema)
         
         #variables for Oracle # will be used to make the connection. DOES NOT CHANGE// imported from another file. 
         # function shown below
@@ -89,14 +93,13 @@ def main():
 #            login = {"username" : 'name', "password" : 'pass', "server" : 'server.com', "service" : 'serviceName', "port" : int}
 #            return login
         credentials = oracleLogin()
-        #schema = grabSchema(options[ 'EndHyper' ])
         # connect and grab oracle table
         connection = conData(credentials["username"], credentials["password"], credentials["server"], credentials["service"], credentials["port"])
-        table = grabData(options[ 'Database' ], geodata, schema, connection) ## raw json data turned to a list of record objects (a list within a list) ## need to add filter year 
+        table = grabData(options[ 'Database' ], connection) ## raw json data turned to a list of record objects (a list within a list) ## need to add filter year 
             
         # Create or Expand the Extract
         extract = openExtract( options[ 'EndHyper' ]) ## the extract to be updated
-        populateExtract( extract, table, allGeo, geoColumns ) 
+        populateExtract( extract, table) 
 
         # Flush the Extract to Disk
         extract.close()

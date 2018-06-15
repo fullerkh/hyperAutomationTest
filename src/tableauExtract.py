@@ -1,13 +1,12 @@
 from geoJson import *
 from tableausdk import *
 from tableausdk.HyperExtract import *
+import os
 #------------------------------------------------------------------------------
 #   Create Extract
 #------------------------------------------------------------------------------
 #   (NOTE: This function assumes that the Tableau SDK Extract API is initialized)
-def openExtract(
-    hyper
-):
+def openExtract(hyper):
     try:
         # Create Extract Object
         # (NOTE: The Extract constructor opens an existing extract with the
@@ -31,17 +30,52 @@ def openExtract(
 #------------------------------------------------------------------------------
 #   (NOTE: This function assumes that the Tableau SDK Extract API is initialized)
 
-def grabSchema(extract):
-    table = extract.openTable( 'Extract' )
-    schema = table.getTableDefinition()
-    getColumns = allColumns(schema)
-    return getColumns
+def grabSchema(hyper):
+    toCreate = {}
+    extract = Extract( hyper )
+    hyper = extract.openTable( 'Extract' )
+    schema = hyper.getTableDefinition()
+    position = 0
+    while position < schema.getColumnCount():
+        columnName = schema.getColumnName(position)
+        columnType = schema.getColumnType(position)
+        #print columnName
+        toCreate.update({columnName : columnType})
+        print columnName + " " + str(columnType)
+        position+=1
+    return toCreate
+
+#------------------------------------------------------------------------------
+#   delete hyper  
+#------------------------------------------------------------------------------
+#   (NOTE: This function assumes that the Tableau SDK Extract API is initialized)
+
+def deleteHyper(name):
+    extract = Extract( name )
+    extract.close()
+    os.remove(name)
+    print "the old hyper named " + name + " has been deleted"
+
+#------------------------------------------------------------------------------
+#   create hyper  
+#------------------------------------------------------------------------------
+#   (NOTE: This function assumes that the Tableau SDK Extract API is initialized)
+
+def createHyper(name, oldSchema):
+    extract = Extract(name)
+    newSchema = TableDefinition()
+    newSchema.setDefaultCollation( Collation.EN_GB )
+    for fieldkey, fieldvalue in oldSchema.iteritems():
+        newSchema.addColumn(fieldkey, fieldvalue)
+    table = extract.addTable( 'Extract', newSchema )
+    print "A new hyper named " + name + " has been created"
+    return table
 
 #------------------------------------------------------------------------------
 #   Populate Extract
 #------------------------------------------------------------------------------
 #   (NOTE: This function assumes that the Tableau SDK Extract API is initialized)
-def populateExtract(extract, oracleTable, allGeo, geoColumns):
+def populateExtract(extract, oracleTable):
     
     try:
         errorColumn = ""
@@ -52,23 +86,22 @@ def populateExtract(extract, oracleTable, allGeo, geoColumns):
         schema = table.getTableDefinition()
         getColumns = allColumns(schema)
         
+        records = oracleTable.allRecords
+        oracleSchema = oracleTable.getSchema
+        
         # Insert Data
-        for record in oracleTable:
-            count +=1
+        for record in records:
             row = Row(schema)
-            for key,value in record.getData():
-                #print "setData(" + str(key) + "," + str(value) + ", row, schema)"
-                errorColumn = " at " + key + " in the oracle table"
-                setData(getColumns[key], value ,row, schema)
-                if key in geoColumns: # if the column name is CPD_NEIGHBORHOOD, SNA_NEIGHBORHOD, or COMMUNITY_COUNCIL_NEIGHBORHOOD
-                    for column in geoColumns[key]: # for the column names in geoColumns( whichever key it hit)
-                        if value != None and value != 'N/A':
-                            cellValue = allGeo[key][value].getProperty(column) 
-                        else: 
-                            cellValue = None
-                        errorColumn = " at " + column + " in the geometry columns of " + key
-                        setData(getColumns[column], cellValue ,row, schema) # find the column position in the hyper schema and set the the value. # have to find out how to get the proper value. 
-            #print count
+            index = 0
+            for value in record:
+                errorColumn = " at " + getColumns[oracleSchema[index]] + " in the oracle table"
+                # might be able to get away with doing a simple setData if fields are matching and unique --- setData(getColumns[oracleSchema[index]], value ,row, schema)
+                if value != None and value != 'N/A':
+                    cellValue = value 
+                else: 
+                    cellValue = None
+                setData(getColumns[oracleSchema[index]], cellValue ,row, schema)
+                index += 1
             table.insert(row)
         print "all " + str(count) + " records added"
     except TableauException, e:
